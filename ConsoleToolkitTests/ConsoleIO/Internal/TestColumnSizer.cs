@@ -102,6 +102,16 @@ namespace ConsoleToolkitTests.ConsoleIO.Internal
         }
 
         [Test]
+        public void IdealMinWidthRespectsFormatterMaxWidth()
+        {
+            var sizer = new ColumnSizer(typeof(string), new ColumnFormat { MaxWidth = 3});
+            sizer.ColumnValue("XXXX XXXX");
+            sizer.ColumnValue("YYYYYY XXXXX");
+            
+            Assert.That(sizer.GetIdealMinimumWidth(), Is.EqualTo(3));
+        }
+
+        [Test]
         public void IdealMinWidthIsReCalculated()
         {
             var sizer = new ColumnSizer(typeof(string));
@@ -160,6 +170,17 @@ namespace ConsoleToolkitTests.ConsoleIO.Internal
 
             var width = sizer.MinWidth(0);
             Assert.That(width, Is.EqualTo(6));
+        }
+
+        [Test]
+        public void MaxWidthColumnMinWidthIsMaxWidth()
+        {
+            var sizer = new ColumnSizer(typeof(string), new ColumnFormat(type: typeof(string)) { MaxWidth = 4});
+            sizer.ColumnValue("XXXX XXXX");
+            sizer.ColumnValue("YYYYYY XXXXX");
+
+            var width = sizer.MinWidth(0);
+            Assert.That(width, Is.EqualTo(4));
         }
 
         [Test]

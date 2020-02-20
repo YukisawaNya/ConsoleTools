@@ -48,7 +48,10 @@ namespace ConsoleToolkit.ConsoleIO.Internal
             if (minWidth > 0)
                 return minWidth;
 
-            return Math.Max(ComputeMinWidthFromData(maxLineBreaks), _format.MinWidth);
+            var maxIncludingMin = Math.Max(ComputeMinWidthFromData(maxLineBreaks), _format.MinWidth);
+            if (_format.MaxWidth > 0)
+                return Math.Min(maxIncludingMin, _format.MaxWidth);
+            return maxIncludingMin;
         }
 
         private int ComputeMinWidthFromData(int maxLineBreaks)
@@ -81,17 +84,23 @@ namespace ConsoleToolkit.ConsoleIO.Internal
                 return _idealMinWidth;
             }
 
+            int ApplyMaxWidth(int width)
+            {
+                if (_format.MaxWidth > 0)
+                    return Math.Min(_format.MaxWidth, width);
+                return width;
+            }
+
             if (_columnType == typeof(string))
             {
-                _idealMinWidth = _values.Max(v => v.GetLongestWordLength(_tabLength));
+                _idealMinWidth = ApplyMaxWidth(_values.Max(v => v.GetLongestWordLength(_tabLength)));
                 _idealMinWidthValid = true;
                 return _idealMinWidth;
             }
 
-            _idealMinWidth = _values.Max(v => v.Width);
+            _idealMinWidth = ApplyMaxWidth(_values.Max(v => v.Width));
             _idealMinWidthValid = true;
             return _idealMinWidth;
-
         }
 
         private int GetFixedMinWidth()
